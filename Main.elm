@@ -9,6 +9,7 @@ import Time exposing (Time)
 import Key exposing (..)
 import Window exposing (Size)
 import Task
+import Process
 
 
 main =
@@ -36,7 +37,10 @@ model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( model, Task.perform (\_ -> NoOp) Resize (Window.size) )
+    ( model, Task.perform
+                    identity
+                    Resize
+                    (Process.sleep 100 `Task.andThen` \_ -> Window.size) )
 
 -- UPDATE
 
