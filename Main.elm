@@ -10,6 +10,8 @@ import Key exposing (..)
 import Window exposing (Size)
 import Task
 import Process
+import Models exposing (Point)
+import Board
 
 
 main =
@@ -20,29 +22,44 @@ main =
         , subscriptions = subscriptions
         }
 
+
+
 -- MODEL
-type alias Position = {x: Float, y: Float }
+
+
 type alias Model =
-    { 
-     windowSize : Size,
-     playerPosition : Position 
+    { -- Window dimensions
+      windowSize :
+        Size
+        -- Center point position of the screen
+    , centerPosition :
+        Point
+    , board :
+        Board.Model
     }
+
 
 model : Model
 model =
-    { 
-     windowSize = Size 0 0
-     , playerPosition = {x= 0, y= 0}
+    { windowSize = Size 0 0
+    , board = Board.model
+    , centerPosition = Point 0 0
     }
+
 
 init : ( Model, Cmd Msg )
 init =
-    ( model, Task.perform
-                    identity
-                    Resize
-                    (Process.sleep 100 `Task.andThen` \_ -> Window.size) )
+    ( model
+    , Task.perform
+        identity
+        Resize
+        (Process.sleep 100 `Task.andThen` \_ -> Window.size)
+    )
+
+
 
 -- UPDATE
+
 
 type Msg
     = TimeUpdate Time
@@ -50,27 +67,28 @@ type Msg
     | Resize Size
     | NoOp
 
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        Resize size -> 
-            ({ model | windowSize = size }, Cmd.none)
-        
+        Resize size ->
+            ( { model | windowSize = size }, Cmd.none )
+
         TimeUpdate dt ->
             ( model, Cmd.none )
 
         KeyDown keyCode ->
-            ( {model | playerPosition = keyDown keyCode model.playerPosition}, Cmd.none )
-        
-        NoOp -> 
-            (model, Cmd.none )
+            ( { model | centerPosition = keyDown keyCode model.centerPosition }, Cmd.none )
 
-keyDown : KeyCode -> Position -> Position
+        NoOp ->
+            ( model, Cmd.none )
+
+
+keyDown : KeyCode -> Point -> Point
 keyDown keyCode position =
     case Key.fromCode keyCode of
-
         ArrowLeft ->
-            { position |  x = position.x - 1 }
+            { position | x = position.x - 1 }
 
         ArrowRight ->
             { position | x = position.x + 1 }
@@ -84,13 +102,19 @@ keyDown keyCode position =
         _ ->
             position
 
+
+
 -- VIEW
+
 
 view : Model -> Html msg
 view model =
     text (toString model)
 
+
+
 -- SUBSCRIPTIONS
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
