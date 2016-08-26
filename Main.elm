@@ -42,7 +42,7 @@ type alias Model =
 model : Model
 model =
     { windowSize = Size 0 0
-    , board = Board.model
+    , board = Board.emptyBoard
     , centerPosition = Point 0 0
     }
 

@@ -1,4 +1,4 @@
-module Board exposing (Model, Msg, update, view, model)
+module Board exposing (Model, Msg, update, view, emptyBoard)
 
 import Html exposing (..)
 import Mouse
@@ -25,12 +25,12 @@ type alias Model =
     }
 
 
-model : Model
-model =
+emptyBoard : Model
+emptyBoard =
     { cells = []
-    , gameSettings = { boardSize = { width = 100, height = 100 } }
-    , viewSize = { width = 100, height = 100 }
-    , centerPoint = { x = 50, y = 50 }
+    , gameSettings = { boardSize = { width = 0, height = 0 } }
+    , viewSize = { width = 0, height = 0 }
+    , centerPoint = { x = 0, y = 0 }
     }
 
 
@@ -40,12 +40,16 @@ model =
 
 type Msg
     = TimeUpdate Time
+    | Resize Dimensions
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         TimeUpdate time ->
+            model
+
+        Resize dimensions ->
             model
 
 

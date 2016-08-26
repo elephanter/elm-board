@@ -19,6 +19,15 @@ type alias Model =
     }
 
 
+emptyModel =
+    { position = Point 0 0
+    , cell =
+        { id = ""
+        , side = 0
+        }
+    }
+
+
 
 -- UPDATE
 
