@@ -59,19 +59,18 @@ update msg model =
             { model
                 | cells = board dimensions model.gameSettings.cellSize model.cells
                 , viewSize = dimensions
-                , lb = ( toFloat (dimensions.width) / 2, toFloat (dimensions.height) / 2 )
             }
-                ! []
+                ! [ changePos ( toFloat (dimensions.width) / 2, toFloat (dimensions.height) / 2 ) ]
 
         ChangePos point ->
-            { model | lb = point } ! []
+            { model | lb = log "Center point: " point } ! []
 
         KeyDown keyCode ->
-            model ! [ msgSend ChangePos (keyDown keyCode model.lb) ]
+            model ! [ changePos (keyDown keyCode model.lb) ]
 
 
-msgSend msg data =
-    Task.perform msg msg (Task.succeed data)
+changePos pnt =
+    Task.perform ChangePos ChangePos (Task.succeed pnt)
 
 
 
@@ -134,16 +133,16 @@ keyDown : KeyCode -> ( Float, Float ) -> ( Float, Float )
 keyDown keyCode position =
     case Key.fromCode keyCode of
         ArrowLeft ->
-            ( fst (position) - 1, snd position )
+            ( fst (position) - 10, snd position )
 
         ArrowRight ->
-            ( fst (position) + 1, snd position )
+            ( fst (position) + 10, snd position )
 
         ArrowUp ->
-            ( fst position, (snd position) - 1 )
+            ( fst position, (snd position) - 10 )
 
         ArrowDown ->
-            ( fst position, (snd position) + 1 )
+            ( fst position, (snd position) + 10 )
 
         _ ->
             position

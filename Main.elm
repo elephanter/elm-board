@@ -76,7 +76,11 @@ update msg model =
                 ! [ updateBoard (Board.Resize size) ]
 
         BoardMsg boardMessage ->
-            ( { model | board = fst <| Board.update boardMessage model.board }, Cmd.none )
+            let
+                ( new_board, cmd ) =
+                    Board.update boardMessage model.board
+            in
+                ( { model | board = new_board }, Cmd.map BoardMsg cmd )
 
         NoOp ->
             ( model, Cmd.none )
