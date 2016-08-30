@@ -1,4 +1,4 @@
-module Cell exposing (Model, Msg, update, view)
+module Cell exposing (Model, emptyModel, Msg, update, view)
 
 import Html exposing (..)
 import Mouse
@@ -6,7 +6,7 @@ import Time exposing (Time)
 import AnimationFrame
 import Collage exposing (..)
 import Color exposing (..)
-import Models exposing (Cell, Point)
+import Models exposing (Cell, Point, GameSettings)
 
 
 -- MODEL
@@ -14,17 +14,21 @@ import Models exposing (Cell, Point)
 
 type alias Model =
     { -- TopLeft point position of square celln
-      position : Point
+      coords : ( Int, Int )
+    , position : ( Float, Float )
     , cell : Cell
+    , cellSize : Int
     }
 
 
 emptyModel =
-    { position = Point 0 0
+    { coords = ( 0, 0 )
+    , position = ( 0, 0 )
     , cell =
         { id = ""
         , side = 0
         }
+    , cellSize = 100
     }
 
 
@@ -53,13 +57,18 @@ update msg model =
 
 view : Model -> Form
 view model =
-    square 50
-        |> filled red
-        |> scale 1
-        |> move ( model.position.x, model.position.y )
+    group
+        [ square (toFloat (model.cellSize))
+            |> filled red
+            |> move ( fst (model.position) - toFloat (model.cellSize) / 2, snd (model.position) - toFloat (model.cellSize) / 2 )
+        , square (toFloat (model.cellSize))
+            |> outlined (solid black)
+            |> move ( fst (model.position) - toFloat (model.cellSize) / 2, snd (model.position) - toFloat (model.cellSize) / 2 )
+        ]
 
 
 
+-- 0,0 now it in left bottom point
 -- SUBSCRIPTIONS
 
 

@@ -2,8 +2,8 @@ module Models exposing (Cell, Point, Dimensions, GameSettings)
 
 
 type alias Point =
-    { x : Float
-    , y : Float
+    { x : Int
+    , y : Int
     }
 
 
@@ -21,4 +21,5 @@ type alias Cell =
 
 type alias GameSettings =
     { boardSize : Dimensions
+    , cellSize : Int
     }

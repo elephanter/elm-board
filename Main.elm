@@ -3,11 +3,12 @@ module Game exposing (..)
 import Html exposing (Html, text)
 import Html.App as Html
 import Html exposing (..)
-import Keyboard exposing (KeyCode)
 import AnimationFrame
+import Collage exposing (collage)
+import Element exposing (toHtml)
 import Time exposing (Time)
-import Key exposing (..)
 import Window exposing (Size)
+import Debug exposing (log)
 import Task
 import Process
 import Models exposing (Point)
@@ -62,9 +63,8 @@ init =
 
 
 type Msg
-    = TimeUpdate Time
-    | KeyDown KeyCode
-    | Resize Size
+    = Resize Size
+    | BoardMsg Board.Msg
     | NoOp
 
 
@@ -72,44 +72,32 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         Resize size ->
-            ( { model | windowSize = size }, Cmd.none )
+            { model | windowSize = log "BoardSize " size }
+                ! [ updateBoard (Board.Resize size) ]
 
-        TimeUpdate dt ->
-            ( model, Cmd.none )
-
-        KeyDown keyCode ->
-            ( { model | centerPosition = keyDown keyCode model.centerPosition }, Cmd.none )
+        BoardMsg boardMessage ->
+            ( { model | board = fst <| Board.update boardMessage model.board }, Cmd.none )
 
         NoOp ->
             ( model, Cmd.none )
 
 
-keyDown : KeyCode -> Point -> Point
-keyDown keyCode position =
-    case Key.fromCode keyCode of
-        ArrowLeft ->
-            { position | x = position.x - 1 }
 
-        ArrowRight ->
-            { position | x = position.x + 1 }
+-- Send messages to our board
 
-        ArrowUp ->
-            { position | y = position.y - 1 }
 
-        ArrowDown ->
-            { position | y = position.y + 1 }
-
-        _ ->
-            position
+updateBoard cmd =
+    Task.perform BoardMsg BoardMsg (Task.succeed cmd)
 
 
 
 -- VIEW
 
 
-view : Model -> Html msg
+view : Model -> Html Msg
 view model =
-    text (toString model)
+    toHtml <|
+        collage model.windowSize.width model.windowSize.height [ Board.view model.board ]
 
 
 
@@ -119,7 +107,6 @@ view model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
-        [ AnimationFrame.diffs TimeUpdate
-        , Keyboard.downs KeyDown
-        , Window.resizes Resize
+        [ Window.resizes Resize
+        , Sub.map BoardMsg (Board.subscriptions model.board)
         ]
